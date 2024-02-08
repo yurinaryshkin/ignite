@@ -31,7 +31,9 @@ import org.apache.ignite.internal.GridKernalContext;
 import org.apache.ignite.internal.pagemem.wal.record.UnwrapDataEntry;
 import org.apache.ignite.internal.processors.cache.CacheObject;
 import org.apache.ignite.internal.processors.cache.CacheObjectContext;
+import org.apache.ignite.internal.processors.cache.CacheObjectImpl;
 import org.apache.ignite.internal.processors.cache.KeyCacheObject;
+import org.apache.ignite.internal.processors.cache.KeyCacheObjectImpl;
 import org.apache.ignite.internal.processors.cache.persistence.file.FileIO;
 import org.apache.ignite.internal.processors.cache.persistence.wal.crc.FastCrc;
 import org.apache.ignite.internal.processors.cache.version.GridCacheVersion;
@@ -343,7 +345,7 @@ public class DumpEntrySerializer {
 
         buf.get(keyBytes, 0, keyBytes.length);
 
-        KeyCacheObject key = co.toKeyCacheObject(fakeCacheObjCtx, keyType, keyBytes);
+        KeyCacheObject key = new KeyCacheObjectImpl(0, keyBytes, part);
 
         if (key.partition() == -1)
             key.partition(part);
@@ -354,7 +356,7 @@ public class DumpEntrySerializer {
 
         buf.get(valBytes, 0, valBytes.length);
 
-        CacheObject val = co.toCacheObject(fakeCacheObjCtx, valType, valBytes);
+        CacheObject val = new CacheObjectImpl(0, valBytes);
 
         return new DumpEntry() {
             @Override public int cacheId() {
