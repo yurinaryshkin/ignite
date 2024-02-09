@@ -285,7 +285,10 @@ public class DumpEntrySerializer {
             buf = plainBuf;
         }
 
-        return plainDataEntry(part, buf);
+        if (dumpEntry == null)
+            dumpEntry = plainDataEntry(part, buf);
+
+        return dumpEntry;
     }
 
     /** */
@@ -319,6 +322,9 @@ public class DumpEntrySerializer {
 
         return buf;
     }
+
+    /** */
+    private DumpEntry dumpEntry;
 
     /** */
     private DumpEntry plainDataEntry(int part, ByteBuffer buf) throws IgniteCheckedException {
