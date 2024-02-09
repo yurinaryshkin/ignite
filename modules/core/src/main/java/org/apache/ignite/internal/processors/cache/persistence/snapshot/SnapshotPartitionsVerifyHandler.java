@@ -391,7 +391,7 @@ public class SnapshotPartitionsVerifyHandler implements SnapshotHandler<Map<Part
     private PartitionHashRecordV2 calculateDumpedPartitionHash(Dump dump, String grpName, int part) {
         PartitionHashRecordV2 r = null;
 
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 5; i++)
             r = calculateDumpedPartitionHash0(dump, grpName, part);
 
         return r;
