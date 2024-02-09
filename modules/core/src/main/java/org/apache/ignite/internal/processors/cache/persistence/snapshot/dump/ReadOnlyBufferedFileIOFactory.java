@@ -15,21 +15,28 @@
  * limitations under the License.
  */
 
-package org.apache.ignite.transactions;
+package org.apache.ignite.internal.processors.cache.persistence.snapshot.dump;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.OpenOption;
+import org.apache.ignite.internal.processors.cache.persistence.file.FileIOFactory;
+import org.apache.ignite.internal.processors.cache.persistence.file.RandomAccessFileIOFactory;
+
+import static java.nio.file.StandardOpenOption.READ;
 
 /**
- *  Exception thrown whenever transaction spans over MVCC and non-MVCC caches.
+ * File I/O factory which provides {@link BufferedFileIO} implementation of FileIO.
  */
-public class TransactionMixedModeException extends TransactionException {
+class ReadOnlyBufferedFileIOFactory implements FileIOFactory {
     /** */
     private static final long serialVersionUID = 0L;
 
-    /**
-     * Creates new exception with given error message.
-     *
-     * @param msg Error message.
-     */
-    public TransactionMixedModeException(String msg) {
-        super(msg);
+    /** */
+    protected final FileIOFactory factory = new RandomAccessFileIOFactory();
+
+    /** {@inheritDoc} */
+    @Override public ReadOnlyBufferedFileIO create(File file, OpenOption... modes) throws IOException {
+        return new ReadOnlyBufferedFileIO(factory.create(file, READ));
     }
 }

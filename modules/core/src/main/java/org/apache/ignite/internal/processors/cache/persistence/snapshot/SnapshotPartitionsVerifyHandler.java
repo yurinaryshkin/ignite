@@ -389,6 +389,16 @@ public class SnapshotPartitionsVerifyHandler implements SnapshotHandler<Map<Part
 
     /** */
     private PartitionHashRecordV2 calculateDumpedPartitionHash(Dump dump, String grpName, int part) {
+        PartitionHashRecordV2 r = null;
+
+        for (int i = 0; i < 5; i++)
+            r = calculateDumpedPartitionHash0(dump, grpName, part);
+
+        return r;
+    }
+
+    /** */
+    private PartitionHashRecordV2 calculateDumpedPartitionHash0(Dump dump, String grpName, int part) {
         if (skipHash()) {
             return new PartitionHashRecordV2(
                 new PartitionKeyV2(CU.cacheId(grpName), part, grpName),
