@@ -26,7 +26,7 @@ import org.apache.ignite.internal.util.typedef.internal.A;
 /** */
 class ReadOnlyBufferedFileIO extends FileIODecorator {
     /** */
-    private static final int DEFAULT_BLOCK_SIZE = 4096;
+    private static final int BLOCK_SIZE = 1024 * 1024;
 
     /** */
     private final ByteBuffer buf;
@@ -43,12 +43,7 @@ class ReadOnlyBufferedFileIO extends FileIODecorator {
 
         A.ensure(fileIO != null, "fileIO must not be null");
 
-        int blockSize = getFileSystemBlockSize();
-
-        if (blockSize <= 0)
-            blockSize = DEFAULT_BLOCK_SIZE;
-
-        buf = ByteBuffer.allocate(blockSize);
+        buf = ByteBuffer.allocate(BLOCK_SIZE);
 
         buf.position(buf.limit());
     }
