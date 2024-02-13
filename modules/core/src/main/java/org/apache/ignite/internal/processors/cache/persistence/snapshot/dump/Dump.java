@@ -260,6 +260,8 @@ public class Dump implements AutoCloseable {
             .collect(Collectors.toList());
     }
 
+    private static long start;
+
     /**
      * @param node Node directory name.
      * @param group Group id.
@@ -324,6 +326,21 @@ public class Dump implements AutoCloseable {
 
             /** */
             private void advance() {
+                if (start == 0)
+                    start = System.currentTimeMillis();
+                else {
+                    long elapsed = System.currentTimeMillis() - start;
+
+                    if (elapsed >= 20 * 1000 && elapsed < 120 * 1000) {
+                        try {
+                            Thread.sleep(120 * 1000 - elapsed);
+                        }
+                        catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+
                 if (next != null)
                     return;
 
