@@ -389,6 +389,8 @@ public class SnapshotPartitionsVerifyHandler implements SnapshotHandler<Map<Part
 
     /** */
     private PartitionHashRecordV2 calculateDumpedPartitionHash(Dump dump, String grpName, int part) {
+        Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+        
         PartitionHashRecordV2 r = null;
 
         for (int i = 0; i < 5; i++)
