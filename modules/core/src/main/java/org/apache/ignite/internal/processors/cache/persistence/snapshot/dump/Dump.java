@@ -329,16 +329,20 @@ public class Dump implements AutoCloseable {
                 if (start == 0)
                     start = System.currentTimeMillis();
                 else {
-                    long elapsed = System.currentTimeMillis() - start;
+                    long hash = 0;
 
-                    if (elapsed >= 20 * 1000 && elapsed < 120 * 1000) {
-                        try {
-                            Thread.sleep(120 * 1000 - elapsed);
-                        }
-                        catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
+                    while (true) {
+                        long elapsed = System.currentTimeMillis() - start;
+
+                        if (elapsed < 20 * 1000 || elapsed >= 120 * 1000)
+                            break;
+
+                        for (int i = 0; i < 1000000; i++)
+                            hash += elapsed * i;
                     }
+
+                    if (hash > 0)
+                        start = -1;
                 }
 
                 if (next != null)
