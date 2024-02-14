@@ -68,6 +68,7 @@ import org.apache.ignite.internal.util.typedef.F;
 import org.apache.ignite.internal.util.typedef.internal.CU;
 import org.apache.ignite.internal.util.typedef.internal.U;
 import org.apache.ignite.spi.encryption.EncryptionSpi;
+import org.apache.ignite.thread.IgniteThreadPoolExecutor;
 import org.jetbrains.annotations.Nullable;
 
 import static org.apache.ignite.internal.pagemem.PageIdAllocator.FLAG_DATA;
@@ -368,8 +369,14 @@ public class SnapshotPartitionsVerifyHandler implements SnapshotHandler<Map<Part
             EncryptionSpi encSpi = opCtx.metadata().encryptionKey() != null ? cctx.gridConfig().getEncryptionSpi() : null;
 
             try (Dump dump = new Dump(opCtx.snapshotDirectory(), consistentId, true, true, encSpi, log)) {
+                IgniteThreadPoolExecutor executor = (IgniteThreadPoolExecutor)cctx.snapshotMgr().snapshotExecutorService();
+
+                executor.setCorePoolSize(1);
+
+                executor.setMaximumPoolSize(1);
+
                 Collection<PartitionHashRecordV2> partitionHashRecordV2s = U.doInParallel(
-                    cctx.snapshotMgr().snapshotExecutorService(),
+                    executor,
                     partFiles,
                     part -> calculateDumpedPartitionHash(dump, cacheGroupName(part.getParentFile()), partId(part.getName()))
                 );
