@@ -371,9 +371,9 @@ public class SnapshotPartitionsVerifyHandler implements SnapshotHandler<Map<Part
             try (Dump dump = new Dump(opCtx.snapshotDirectory(), consistentId, true, true, encSpi, log)) {
                 IgniteThreadPoolExecutor executor = (IgniteThreadPoolExecutor)cctx.snapshotMgr().snapshotExecutorService();
 
-                executor.setCorePoolSize(1);
+                executor.setCorePoolSize(2);
 
-                executor.setMaximumPoolSize(1);
+                executor.setMaximumPoolSize(2);
 
                 Collection<PartitionHashRecordV2> partitionHashRecordV2s = U.doInParallel(
                     executor,
