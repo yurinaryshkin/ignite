@@ -184,7 +184,7 @@ public class IgniteConfiguration {
     public static final int DFLT_SYSTEM_CORE_THREAD_CNT = DFLT_PUBLIC_THREAD_CNT;
 
     /** Default size of query thread pool. */
-    public static final int DFLT_QUERY_THREAD_POOL_SIZE = DFLT_PUBLIC_THREAD_CNT;
+    public static final int DFLT_QUERY_THREAD_POOL_SIZE = 12;
 
     /** Default size of index create/rebuild thread pool. */
     public static final int DFLT_BUILD_IDX_THREAD_POOL_SIZE = min(4, max(1, AVAILABLE_PROC_CNT / 4));
