@@ -157,10 +157,10 @@ public class IgniteConfiguration {
     public static final int DFLT_TIME_SERVER_PORT_RANGE = 100;
 
     /** Default core size of public thread pool. */
-    public static final int AVAILABLE_PROC_CNT = 8;
+    public static final int AVAILABLE_PROC_CNT = 4;
 
     /** Default core size of public thread pool. */
-    public static final int DFLT_PUBLIC_THREAD_CNT = max(8, AVAILABLE_PROC_CNT);
+    public static final int DFLT_PUBLIC_THREAD_CNT = 4;
 
     /** Default size of data streamer thread pool. */
     public static final int DFLT_DATA_STREAMER_POOL_SIZE = DFLT_PUBLIC_THREAD_CNT;
