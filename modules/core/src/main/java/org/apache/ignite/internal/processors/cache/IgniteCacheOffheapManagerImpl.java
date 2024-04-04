@@ -100,26 +100,14 @@ import static org.apache.ignite.internal.processors.cache.distributed.dht.topolo
  *
  */
 public class IgniteCacheOffheapManagerImpl implements IgniteCacheOffheapManager {
-    /** */
-    private static class RemovedFromPendingEntries extends KeyCacheObjectImpl {
-        /** Serial version uid. */
-        private static final long serialVersionUID = 0L;
-
-        /** */
-        private RemovedFromPendingEntries(KeyCacheObjectImpl keyCacheObj) {
-            super(keyCacheObj.val, keyCacheObj.valBytes, keyCacheObj.partition());
-        }
-
-        /** */
-        public RemovedFromPendingEntries() {
-        }
-    }
-
     /** The maximum number of entries that can be preloaded under checkpoint read lock. */
     public static final int PRELOAD_SIZE_UNDER_CHECKPOINT_LOCK = 100;
 
     /** Batch size for cache removals during destroy. */
     private static final int BATCH_SIZE = 1000;
+
+    /** */
+    private static final ThreadLocal<Boolean> deletingPendingEntries = new ThreadLocal<>();
 
     /** */
     protected GridCacheSharedContext ctx;
@@ -1142,6 +1130,8 @@ public class IgniteCacheOffheapManagerImpl implements IgniteCacheOffheapManager 
                 return 0;
 
             try {
+                deletingPendingEntries.set(Boolean.TRUE);
+
                 List<PendingRow> rows = pendingEntries.remove(
                     new PendingRow(cacheId, Long.MIN_VALUE, 0), new PendingRow(cacheId, U.currentTimeMillis(), 0), amount);
 
@@ -1154,8 +1144,7 @@ public class IgniteCacheOffheapManagerImpl implements IgniteCacheOffheapManager 
                     if (obsoleteVer == null)
                         obsoleteVer = cctx.cache().nextVersion();
 
-                    GridCacheEntryEx entry = cctx.cache().entryEx(row.key instanceof KeyCacheObjectImpl
-                        ? new RemovedFromPendingEntries((KeyCacheObjectImpl)row.key) : row.key);
+                    GridCacheEntryEx entry = cctx.cache().entryEx(row.key);
 
                     if (entry != null)
                         c.apply(entry, obsoleteVer);
@@ -1164,6 +1153,8 @@ public class IgniteCacheOffheapManagerImpl implements IgniteCacheOffheapManager 
                 return rows.size();
             }
             finally {
+                deletingPendingEntries.remove();
+
                 busyLock.leaveBusy();
             }
         }
@@ -1799,7 +1790,7 @@ public class IgniteCacheOffheapManagerImpl implements IgniteCacheOffheapManager 
          */
         private void finishRemove(GridCacheContext cctx, KeyCacheObject key, @Nullable CacheDataRow oldRow) throws IgniteCheckedException {
             if (oldRow != null) {
-                if (!(key instanceof RemovedFromPendingEntries))
+                if (deletingPendingEntries.get() == null)
                     clearPendingEntries(cctx, oldRow);
 
                 decrementSize(cctx.cacheId());
